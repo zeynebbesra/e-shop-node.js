@@ -1,14 +1,41 @@
-const {Category} = require('../models/user')
+const {Category} = require('../models/category')
 const express = require('express')
 const router = express.Router()
 
 router.get(`/`, async(req,res)=>{
-    const userList = await Category.find()
+    const categoryList = await Category.find()
 
     if(!categoryList){
         res.status(500).json({succes: false})
     }
-    res.send(categoryListList)
+    res.send(categoryList)
+})
+
+router.post('/', async(req,res)=>{
+    let category = new Category({
+        name: req.body.name,
+        icon: req.body.icon,
+        color: req.body.color
+    })
+    category = await category.save()
+
+    if(!category)
+    return res.status(404).send('the category cannot be created.')
+
+    res.send(category)
+})
+
+router.delete('/:id', (req,res)=>{
+    Category.findByIdAndRemove(req.params.id).then(category => {
+        if(category) {
+            return res.status(201).json({succes:true, message: 'the category is deleted.'})
+        } else {
+            return res.status(404).json({succes:false, message:'category not found'})
+        }
+    }).catch((err) => {
+        console.log(err)
+        return res.status(500).json({succes:false, error:err})
+    })
 })
 
 module.exports = router
