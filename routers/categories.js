@@ -31,7 +31,7 @@ router.post('/', async(req,res)=>{
     if(!category)
     return res.status(404).send('the category cannot be created.')
 
-    res.send(category)
+    res.status(201).json({message: 'Category created successfully', category})
 })
 
 
@@ -52,7 +52,7 @@ router.put('/:id', async(req,res)=>{
         }
 
         // Başarılı durumda yanıt döndür
-        res.status(200).json({ updatedCategory, message: 'Category updated successfully' });
+        res.status(200).json({message: 'Category updated successfully', updatedCategory});
 
     } catch (err) {
         console.log(err); // Sunucuda hata bilgisi loglanır

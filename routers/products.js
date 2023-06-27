@@ -52,8 +52,8 @@ router.post(`/`, async(req, res) => {
     const categoryId = req.body.category
     if (!mongoose.Types.ObjectId.isValid(categoryId))
     return res.status(400).send('Invalid Category ID')
-    const category = await Category.findById(categoryId)
-    if (!category) return res.status(400).send('Invalid Category')
+    // const category = await Category.findById(categoryId)
+    // if (!category) return res.status(400).send('Invalid Category')
   
     let product = new Product({
       name: req.body.name,
@@ -74,7 +74,7 @@ router.post(`/`, async(req, res) => {
     if (!product)
     return res.status(500).send('The product cannot be created')
      
-    res.send(product)
+    res.status(201).json({message: 'Product created successfully', product})
   } catch (error) {
     console.log(error)
     res.status(500).send(`An error occurred: ${error.message}`)
@@ -83,12 +83,13 @@ router.post(`/`, async(req, res) => {
 
 router.put('/:id', async(req,res) => {
   try{
-    const categoryId = req.body.category
-    if (!mongoose.Types.ObjectId.isValid(categoryId))
-    return res.status(400).send('Invalid Category ID')
-    // const category = await Category.findById(categoryId)
-    // if (!category) return res.status(400).send('Invalid Category')
+    
+    if (!mongoose.Types.ObjectId.isValid(req.body.category))
+    return res.status(404).json({ message:'Invalid category ID' })
 
+    // if (!mongoose.Types.ObjectId.isValid(req.params.id)){
+    //   res.status(404).json({ message:'Invalid product ID' })
+    // }
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,{
         name: req.body.name,
@@ -107,10 +108,10 @@ router.put('/:id', async(req,res) => {
     )
     
     if(!updatedProduct){
-      return res.status(400).send('The product can not be updated.')
+      return res.status(400).send('The product can not be updated.') //product id yanlış olursa
     }
 
-    res.status(200).json({updatedProduct, message: 'Product updated successfully'})
+    res.status(200).json({message: 'Product updated successfully', updatedProduct})
 
   } catch(err){
     console.log(err)
