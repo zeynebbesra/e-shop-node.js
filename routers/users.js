@@ -2,14 +2,48 @@ const {User} = require('../models/user')
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 router.get(`/`, async(req,res)=>{
-    const userList = await User.find()
+    const userList = await User.find().select('-passwordHash')
 
     if(!userList){
         res.status(500).json({succes: false})
     }
     res.send(userList)
+})
+
+router.get('/:id', async(req,res)=>{
+    const user = await User.findById(req.params.id).select('-passwordHash')
+
+    if (!user){
+        res.status(404).json({message: 'The user with the given ID was not found'})
+    }
+    res.status(200).send(user)
+})
+
+//we can make our server protected so no ne can use the api without a token
+router.post('/login', async(req,res)=>{
+    const user = await User.findOne({email: req.body.email})
+    const secret = process.env.secret
+    if(!user){
+        return res.status(404).json({message: 'The user not found!'})
+    }
+    
+    if(user && bcrypt.compareSync(req.body.password, user.passwordHash)){
+
+        const token = jwt.sign(
+            {
+                userId: user.id
+            },
+            secret,
+            {expiresIn: '1w'}
+        )
+        return res.status(200).json({message: 'User authenticated.', token: token})
+    } else {
+        return res.status(400).json({message: 'Password is wrong!'})
+    }
+    
 })
 
 router.post('/', async(req,res)=>{
