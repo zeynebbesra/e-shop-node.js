@@ -81,7 +81,7 @@ router.post(`/`, async(req, res) => {
     if (!product)
     return res.status(500).send('The product cannot be created')
      
-    res.status(201).json({message: 'Product created successfully', product})
+    res.status(200).json({message: 'Product created successfully', product})
   } catch (error) {
     console.log(error)
     res.status(500).send(`An error occurred: ${error.message}`)
