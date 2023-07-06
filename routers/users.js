@@ -137,12 +137,12 @@ router.delete('/:id', (req,res)=>{
 
 router.get('/get/count', async(req, res)=>{
     try{
-        const userCount = await User.countDocuments((count) => count)
+        const userCount = await User.countDocuments()
 
-        if(!userCount) {
-            res.status(500).json({success: false})
+        if (userCount===0) {
+            return res.status(404).json({message:'there are no users'})
         } else {
-            res.status(200).json({ userCount: userCount });
+            return res.status(200).json({userCount: userCount});
         }
     } catch (error) {
         res.status(500).json({ success: false, error: error.toString() });

@@ -144,12 +144,12 @@ router.get('/get/count', async(req,res)=>{
     const productCount = await Product.countDocuments();
 
     if (productCount === 0) {
-      res.status(500).json({ message:'there are no products' });
+      return res.status(404).json({ message:'there are no products' });
     } else {
-      res.status(200).json({ productCount: productCount });
+      return res.status(200).json({ productCount: productCount });
     }
   } catch (error) {
-    res.status(500).json({ success: false, error: error.toString() });
+    return res.status(500).json({ success: false, error: error.toString() });
   }
 });
 

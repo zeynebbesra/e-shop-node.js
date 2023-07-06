@@ -24,7 +24,6 @@ function authJwt(){
 // payload: payload contains the data which are inside the token for example i want to get isAdmin from the token which is signed to the user and this user is sending it to me with the request headers 
 
 async function isRevoked(req, payload) {
-    console.log("payload", payload)
     if(payload.isAdmin==false){
         console.log('Not admin')
         return true
