@@ -22,7 +22,7 @@ router.get('/:id', async(req,res)=>{
     res.status(200).send(user)
 })
 
-//we can make our server protected so no ne can use the api without a token
+//we can make our server protected so no one can use the api without a token
 router.post('/login', async(req,res)=>{
     const user = await User.findOne({email: req.body.email})
     const secret = process.env.secret
