@@ -24,11 +24,10 @@ router.get(`/:id`, async (req,res)=>{
 })
 
 
-
 router.post('/', async(req,res)=>{
     const orderItemsIds = Promise.all(req.body.orderItems.map(async (orderItem)=>{
         let newOrderItem = new OrderItem({
-            quantity: req.body.quantity,
+            quantity: orderItem.quantity,
             product: orderItem.product
         })
 
@@ -130,5 +129,19 @@ router.get('/get/count', async(req,res)=>{
       return res.status(500).json({ success: false, error: error.toString() });
     }
   });
+
+router.get('/get/userorders/:usrerid', async (req,res) =>{
+    const userOrderList = await Order.find({user: req.params.userid}).populate({
+        path: 'orderItem', populate: {
+            path: 'product', populate: 'category'}
+    }).sort({'dateOrdered': -1})
+
+    if(!userOrderList){
+        return res.status(200).json({succes: false})
+    }
+    return res.send(userOrderList)
+
+})
+
 
 module.exports = router
