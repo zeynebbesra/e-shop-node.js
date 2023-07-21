@@ -3,6 +3,36 @@ const {Product} = require('../models/product')
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
+const multer = require('multer')
+
+const FILE_TYPE_MAP = {
+  'image/png': 'png',
+  'image/jpeg': 'jpeg',
+  'image/jpg': 'jpg'
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const isValid = FILE_TYPE_MAP[file.mimetype]
+    let uploadError = new Error('invalid image type')
+
+    if(isValid) {
+      uploadError = null
+    }
+
+    cb(uploadError, 'public/uploads')
+  },
+  filename: function (req, file, cb) {
+    //const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    const fileName = file.originalname.split(' ').join('-')
+    const extension = FILE_TYPE_MAP[file.mimetype] 
+    cb(null, `${fileName}-${Date.now()}.${extension}`)
+  }
+})
+
+const uploadOptions = multer({ storage: storage })
+
+
 
 router.get(`/`,async (req, res)=>{
   //http://localhost:3000/api/v1/products?categories=15456461,5643231
@@ -54,9 +84,11 @@ router.get(`/`,async (req, res)=>{
 
 //  })
 
-router.post(`/`, async(req, res) => {
+router.post(`/`, uploadOptions.single('image'), async(req, res) => {
   try {
     const categoryId = req.body.category
+    const fileName = req.file.filename
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
     if (!mongoose.Types.ObjectId.isValid(categoryId))
     return res.status(400).send('Invalid Category ID')
     // const category = await Category.findById(categoryId)
@@ -66,7 +98,7 @@ router.post(`/`, async(req, res) => {
       name: req.body.name,
       description: req.body.description,
       richDescription: req.body.richDescription,
-      images: req.body.images,
+      image: `${basePath}${fileName}`, //"http://localhost:3000/public/upload/image-232323"
       brand: req.body.brand,
       price: req.body.price,
       category: req.body.category,
