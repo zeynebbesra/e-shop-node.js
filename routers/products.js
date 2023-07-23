@@ -33,7 +33,6 @@ const storage = multer.diskStorage({
 const uploadOptions = multer({ storage: storage })
 
 
-
 router.get(`/`,async (req, res)=>{
   //http://localhost:3000/api/v1/products?categories=15456461,5643231
 
@@ -87,13 +86,16 @@ router.get(`/`,async (req, res)=>{
 router.post(`/`, uploadOptions.single('image'), async(req, res) => {
   try {
     const categoryId = req.body.category
-    const fileName = req.file.filename
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
     if (!mongoose.Types.ObjectId.isValid(categoryId))
     return res.status(400).send('Invalid Category ID')
-    // const category = await Category.findById(categoryId)
-    // if (!category) return res.status(400).send('Invalid Category')
-  
+
+    const file = req.file
+    if(!file) return res.status(404).json({message:"There is no image in the request"})
+    
+    const fileName = req.file.filename
+    console.log("req.file", req.file)
+    
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
     let product = new Product({
       name: req.body.name,
       description: req.body.description,
